@@ -1,12 +1,13 @@
 import logging
 import os
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
+from telegram.ext import filters  # Updated import for Filters
 import json
 
 # Load environment variables securely
-TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Fetching the Telegram bot token from environment variables
-RENDER_URL = os.getenv('RENDER_URL')     # Fetching the Render URL from environment variables (if needed for webhook)
+TOKEN = os.getenv('TELEGRAM_API_TOKEN')
+RENDER_URL = os.getenv('RENDER_URL')
 
 # Predefined FAQs
 faq_data = {
@@ -33,11 +34,9 @@ def help(update: Update, context: CallbackContext) -> None:
 def handle_message(update: Update, context: CallbackContext) -> None:
     user_message = update.message.text.lower()
     
-    # Check if the message matches FAQ
     if user_message in faq_data:
         response = faq_data[user_message]
     else:
-        # Save user query if no FAQ match found
         response = "Please wait, our team will respond shortly."
         with open('user_data.json', 'a') as f:
             json.dump({'user': update.message.from_user.id, 'message': update.message.text}, f)
@@ -56,14 +55,12 @@ def main():
     updater = Updater(TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
-    # Add command handlers
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help))
 
-    # Add message handler to capture user input
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+    # Use the updated filters syntax
+    dispatcher.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    # Start the bot
     updater.start_polling()
     updater.idle()
 
