@@ -1,10 +1,12 @@
 import logging
+import os
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import json
 
-# Telegram bot token from BotFather
-TOKEN = 'YOUR_BOT_API_TOKEN'
+# Load the environment variables
+TOKEN = os.getenv('TELEGRAM_API_TOKEN')  # Fetching Telegram bot token from environment variables
+RENDER_URL = os.getenv('RENDER_URL')     # Fetching the Render URL if needed for webhook or any other use
 
 # Predefined FAQs
 faq_data = {
